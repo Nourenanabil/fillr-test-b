@@ -4,10 +4,25 @@
 // which describes all the fields in each frame.
 
 // This is a template to help you get started, feel free to make your own solution.
+
+//Add scrapeFields function to access fields within a form
+function scrapeFields() {
+try{
+  const form = window.document.querySelector("form");
+  console.log("Form content", form)
+
+} catch (error) {
+    console.error("Error scraping fields:", error);
+  }
+}
+
 function execute() {
 	try {
     // Step 1 Scrape Fields and Create Fields list object.
     // Step 2 Add Listener for Top Frame to Receive Fields.
+
+    scrapeFields()
+    
     if (isTopFrame()) {
       window.addEventListener('message', (event) => {
         // - Merge fields from frames.
