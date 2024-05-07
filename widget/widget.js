@@ -24,6 +24,8 @@ function execute() {
 
     if (isTopFrame()) {
       window.top.addEventListener("message", (event) => {
+        console.log("Received fields from child frame:", event?.data);
+
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
