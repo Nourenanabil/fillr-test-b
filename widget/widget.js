@@ -10,6 +10,25 @@ function scrapeFields() {
   try {
     const form = window.document.querySelector("form");
     console.log("Form content", form);
+
+    if (form) {
+      // Get all input fields within the form
+      const fields = {};
+      const inputs = form.querySelectorAll("input, select, textarea");
+      inputs.forEach((input) => {
+        console.log(input, "input");
+
+        const labelElement = form.querySelector(`label[for="${input.id}"]`);
+
+        // Extract the label text or use a default label if no label element found
+        const label = labelElement ? labelElement.textContent : "Unnamed";
+        console.log(label, "label");
+
+        // // Add the input name and its label to the fields object
+        fields[input.name] = label;
+      });
+      window.top.postMessage({ fields }, "http://localhost:9999/?id=25360429");
+    }
   } catch (error) {
     console.error("Error scraping fields:", error);
   }
