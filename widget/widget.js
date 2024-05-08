@@ -6,6 +6,8 @@
 // This is a template to help you get started, feel free to make your own solution.
 
 //Add scrapeFields function to access fields within a form
+
+const topWindowUrl = "http://localhost:9999/?id=25360429";
 function scrapeFields() {
   try {
     const form = window.document.querySelector("form");
@@ -27,32 +29,33 @@ function scrapeFields() {
         // // Add the input name and its label to the fields object
         fields.push({ [input.name]: label });
       });
-      getTopFrame().postMessage(
-        JSON.stringify(fields),
-        "http://localhost:9999/?id=25360429"
-      );
+      return fields;
     }
   } catch (error) {
     console.error("Error scraping fields:", error);
   }
 }
-
+function sendFieldsToTopWindow(fields) {
+  getTopFrame().postMessage(fields, topWindowUrl);
+}
 function execute() {
   try {
     // Step 1 Scrape Fields and Create Fields list object.
     // Step 2 Add Listener for Top Frame to Receive Fields.
 
-    scrapeFields();
-
+    const fields = JSON.stringify(scrapeFields());
+    console.log(fields);
     if (isTopFrame()) {
       getTopFrame().addEventListener("message", (event) => {
-        console.log("Received fields from child frame:", event?.data);
+        const fields = event.data;
+        console.log("Received fields from child frame:", fields);
 
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
     } else if (!isTopFrame()) {
       // Child frames sends Fields up to Top Frame.
+      sendFieldsToTopWindow(fields);
     }
   } catch (e) {
     console.error(e);
