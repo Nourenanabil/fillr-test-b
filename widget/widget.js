@@ -13,7 +13,7 @@ function scrapeFields() {
 
     if (form) {
       // Get all input fields within the form
-      const fields = {};
+      const fields = [];
       const inputs = form.querySelectorAll("input, select, textarea");
       inputs.forEach((input) => {
         console.log(input, "input");
@@ -25,9 +25,12 @@ function scrapeFields() {
         console.log(label, "label");
 
         // // Add the input name and its label to the fields object
-        fields[input.name] = label;
+        fields.push({ [input.name]: label });
       });
-      window.top.postMessage({ fields }, "http://localhost:9999/?id=25360429");
+      getTopFrame().postMessage(
+        JSON.stringify(fields),
+        "http://localhost:9999/?id=25360429"
+      );
     }
   } catch (error) {
     console.error("Error scraping fields:", error);
@@ -42,7 +45,7 @@ function execute() {
     scrapeFields();
 
     if (isTopFrame()) {
-      window.top.addEventListener("message", (event) => {
+      getTopFrame().addEventListener("message", (event) => {
         console.log("Received fields from child frame:", event?.data);
 
         // - Merge fields from frames.
