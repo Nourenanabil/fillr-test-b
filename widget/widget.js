@@ -8,35 +8,7 @@
 //Add scrapeFields function to access fields within a form
 
 const TOP_WINDOW_URL = "http://localhost:9999/?id=25360429";
-const TOTAL_FRAMES = countFrames(window.top);
-
-function scrapeFields() {
-  try {
-    const form = window.document.querySelector("form");
-    console.log("Form content", form);
-
-    if (form) {
-      // Get all input fields within the form
-      const fields = [];
-      const inputs = form.querySelectorAll("input, select, textarea");
-      inputs.forEach((input) => {
-        console.log(input, "input");
-
-        const labelElement = form.querySelector(`label[for="${input.id}"]`);
-
-        // Extract the label text or use a default label if no label element found
-        const label = labelElement ? labelElement.textContent : "Unnamed";
-        console.log(label, "label");
-
-        // // Add the input name and its label to the fields object
-        fields.push({ [input.name]: label });
-      });
-      return fields;
-    }
-  } catch (error) {
-    console.error("Error scraping fields:", error);
-  }
-}
+const INPUT_FIELDS = ["input", "select", "textarea"];
 
 const sortByNameAscending = (array) => {
   return array.slice().sort((a, b) => {
@@ -45,6 +17,23 @@ const sortByNameAscending = (array) => {
     return nameA.localeCompare(nameB);
   });
 };
+
+function scrapeFields() {
+  try {
+    const form = window.document.querySelector("form");
+    if (!form) {
+      return [];
+    }
+
+    const inputs = form.querySelectorAll(INPUT_FIELDS.join(", "));
+    return Array.from(inputs).map(({ id, name }) => {
+      const labelElement = form.querySelector(`label[for="${id}"]`);
+      return { [name]: labelElement?.textContent };
+    });
+  } catch (error) {
+    console.error("Error scraping fields:", error);
+  }
+}
 
 function sendFieldsToTopWindow(fields) {
   getTopFrame().postMessage(fields, TOP_WINDOW_URL);
@@ -67,7 +56,7 @@ function execute() {
     // Step 2 Add Listener for Top Frame to Receive Fields.
 
     const fields = scrapeFields();
-    console.log("Total frames:", TOTAL_FRAMES);
+    console.log("Total frames:", totalFrames);
     console.log(fields);
     if (isTopFrame()) {
       let mergedFields = [];
@@ -81,7 +70,7 @@ function execute() {
         mergedFields.push(...data);
         console.log(mergedFields, "mergedFields");
 
-        if (countFrames === TOTAL_FRAMES) {
+        if (countFrames === totalFrames) {
           const sortedFields = sortByNameAscending(mergedFields);
           console.log(sortedFields, "sorted fields");
           const framesLoadedEvent = new CustomEvent("frames:loaded", {
@@ -101,10 +90,6 @@ function execute() {
   }
 }
 
-execute();
-
-// Utility functions to check and get the top frame
-// as Karma test framework changes top & context frames.
 // Use this instead of "window.top".
 function getTopFrame() {
   return window.top.frames[0];
@@ -113,3 +98,6 @@ function getTopFrame() {
 function isTopFrame() {
   return window.location.pathname == "/context.html";
 }
+
+const totalFrames = countFrames(window.top);
+execute(totalFrames);
