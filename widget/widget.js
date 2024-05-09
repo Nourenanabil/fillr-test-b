@@ -52,41 +52,32 @@ function scrapeFields() {
   }
 }
 
-function execute() {
+function execute(totalFrames) {
   try {
-    // Step 1 Scrape Fields and Create Fields list object.
-    // Step 2 Add Listener for Top Frame to Receive Fields.
-
     const fields = scrapeFields();
-    console.log("Total frames:", totalFrames);
-    console.log(fields);
-    if (isTopFrame()) {
-      let mergedFields = [];
-      mergedFields.push(...fields);
-      let countFrames = 0;
 
-      getTopFrame().addEventListener("message", ({ data }) => {
-        console.log("Received fields from child frame:", data);
-        countFrames++;
-        console.log(countFrames, "count frames");
-        mergedFields.push(...data);
-        console.log(mergedFields, "mergedFields");
-
-        if (countFrames === totalFrames) {
-          const sortedFields = sortByNameAscending(mergedFields);
-          console.log(sortedFields, "sorted fields");
-          const framesLoadedEvent = new CustomEvent("frames:loaded", {
-            detail: { fields: sortedFields },
-          });
-          window.document.dispatchEvent(framesLoadedEvent);
-        }
-        // - Merge fields from frames.
-        // - Process Fields and send event once all fields are collected.
-      });
-    } else if (!isTopFrame()) {
-      // Child frames sends Fields up to Top Frame.
+    if (!isTopFrame()) {
       sendFieldsToTopWindow(fields);
+      return;
     }
+
+    let mergedFields = [];
+    mergedFields.push(...fields);
+    let countFrames = 0;
+
+    getTopFrame().addEventListener("message", ({ data }) => {
+      console.log("Received fields from child frame:", data);
+      countFrames++;
+      mergedFields.push(...data);
+
+      if (countFrames === totalFrames) {
+        const sortedFields = sortByNameAscending(mergedFields);
+        const framesLoadedEvent = new CustomEvent("frames:loaded", {
+          detail: { fields: sortedFields },
+        });
+        window.document.dispatchEvent(framesLoadedEvent);
+      }
+    });
   } catch (e) {
     console.error(e);
   }
