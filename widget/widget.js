@@ -80,9 +80,14 @@ function execute() {
         console.log(countFrames, "count frames");
         mergedFields.push(...data);
         console.log(mergedFields, "mergedFields");
+
         if (countFrames === TOTAL_FRAMES) {
           const sortedFields = sortByNameAscending(mergedFields);
-          console.log(sortedFields, "sorted fields")
+          console.log(sortedFields, "sorted fields");
+          const framesLoadedEvent = new CustomEvent("frames:loaded", {
+            detail: { fields: sortedFields },
+          });
+          window.document.dispatchEvent(framesLoadedEvent);
         }
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
