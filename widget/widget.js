@@ -45,8 +45,8 @@ function countFrames(windowObj) {
   let count = 0;
 
   for (let i = 0; i < windowObj.frames.length; i++) {
-      count++;
-      count += countFrames(windowObj.frames[i]);
+    count++;
+    count += countFrames(windowObj.frames[i]);
   }
 
   return count;
@@ -61,14 +61,16 @@ function execute() {
     console.log("Total frames:", TOTAL_FRAMES);
     console.log(fields);
     if (isTopFrame()) {
-
       let mergedFields = [];
       mergedFields.push(...fields);
+      let countFrames = 0;
 
       getTopFrame().addEventListener("message", ({ data }) => {
         console.log("Received fields from child frame:", data);
+        countFrames++;
+        console.log(countFrames, "count frames");
         mergedFields.push(...data);
-        console.log(mergedFields, "mergedFields")
+        console.log(mergedFields, "mergedFields");
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
