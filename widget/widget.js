@@ -7,7 +7,9 @@
 
 //Add scrapeFields function to access fields within a form
 
-const topWindowUrl = "http://localhost:9999/?id=25360429";
+const TOP_WINDOW_URL = "http://localhost:9999/?id=25360429";
+const TOTAL_FRAMES = countFrames(window.top);
+
 function scrapeFields() {
   try {
     const form = window.document.querySelector("form");
@@ -36,23 +38,37 @@ function scrapeFields() {
   }
 }
 function sendFieldsToTopWindow(fields) {
-  getTopFrame().postMessage(fields, topWindowUrl);
+  getTopFrame().postMessage(fields, TOP_WINDOW_URL);
 }
+
+function countFrames(windowObj) {
+  let count = 0;
+
+  for (let i = 0; i < windowObj.frames.length; i++) {
+      count++;
+      count += countFrames(windowObj.frames[i]);
+  }
+
+  return count;
+}
+
 function execute() {
   try {
     // Step 1 Scrape Fields and Create Fields list object.
     // Step 2 Add Listener for Top Frame to Receive Fields.
 
     const fields = scrapeFields();
+    console.log("Total frames:", TOTAL_FRAMES);
     console.log(fields);
     if (isTopFrame()) {
 
       let mergedFields = [];
       mergedFields.push(...fields);
-      
+
       getTopFrame().addEventListener("message", ({ data }) => {
         console.log("Received fields from child frame:", data);
         mergedFields.push(...data);
+        console.log(mergedFields, "mergedFields")
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
