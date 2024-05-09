@@ -43,13 +43,16 @@ function execute() {
     // Step 1 Scrape Fields and Create Fields list object.
     // Step 2 Add Listener for Top Frame to Receive Fields.
 
-    const fields = JSON.stringify(scrapeFields());
+    const fields = scrapeFields();
     console.log(fields);
     if (isTopFrame()) {
-      getTopFrame().addEventListener("message", (event) => {
-        const fields = event.data;
-        console.log("Received fields from child frame:", fields);
 
+      let mergedFields = [];
+      mergedFields.push(...fields);
+      
+      getTopFrame().addEventListener("message", ({ data }) => {
+        console.log("Received fields from child frame:", data);
+        mergedFields.push(...data);
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
