@@ -1,14 +1,20 @@
 "use strict";
-// Write your module here
-// It must send an event "frames:loaded" from the top frame containing a list of { name:label } pairs,
-// which describes all the fields in each frame.
 
-// This is a template to help you get started, feel free to make your own solution.
-
-//Add scrapeFields function to access fields within a form
-
+const TOP_FRAME_LOCATION = "/context.html";
 const TOP_WINDOW_URL = "http://localhost:9999/?id=25360429";
 const INPUT_FIELDS = ["input", "select", "textarea"];
+
+function getTopFrame() {
+  return window.top.frames[0];
+}
+
+function isTopFrame() {
+  return window.location.pathname === TOP_FRAME_LOCATION;
+}
+
+function sendFieldsToTopWindow(fields) {
+  getTopFrame().postMessage(fields, TOP_WINDOW_URL);
+}
 
 const sortByNameAscending = (array) => {
   return array.slice().sort((a, b) => {
@@ -17,6 +23,17 @@ const sortByNameAscending = (array) => {
     return nameA.localeCompare(nameB);
   });
 };
+
+function countFrames(windowObj) {
+  let count = 0;
+
+  for (let i = 0; i < windowObj.frames.length; i++) {
+    count++;
+    count += countFrames(windowObj.frames[i]);
+  }
+
+  return count;
+}
 
 function scrapeFields() {
   try {
@@ -33,21 +50,6 @@ function scrapeFields() {
   } catch (error) {
     console.error("Error scraping fields:", error);
   }
-}
-
-function sendFieldsToTopWindow(fields) {
-  getTopFrame().postMessage(fields, TOP_WINDOW_URL);
-}
-
-function countFrames(windowObj) {
-  let count = 0;
-
-  for (let i = 0; i < windowObj.frames.length; i++) {
-    count++;
-    count += countFrames(windowObj.frames[i]);
-  }
-
-  return count;
 }
 
 function execute() {
@@ -88,15 +90,6 @@ function execute() {
   } catch (e) {
     console.error(e);
   }
-}
-
-// Use this instead of "window.top".
-function getTopFrame() {
-  return window.top.frames[0];
-}
-
-function isTopFrame() {
-  return window.location.pathname == "/context.html";
 }
 
 const totalFrames = countFrames(window.top);
