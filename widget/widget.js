@@ -37,6 +37,15 @@ function scrapeFields() {
     console.error("Error scraping fields:", error);
   }
 }
+
+const sortByNameAscending = (array) => {
+  return array.slice().sort((a, b) => {
+    const nameA = Object.keys(a)[0];
+    const nameB = Object.keys(b)[0];
+    return nameA.localeCompare(nameB);
+  });
+};
+
 function sendFieldsToTopWindow(fields) {
   getTopFrame().postMessage(fields, TOP_WINDOW_URL);
 }
@@ -71,6 +80,10 @@ function execute() {
         console.log(countFrames, "count frames");
         mergedFields.push(...data);
         console.log(mergedFields, "mergedFields");
+        if (countFrames === TOTAL_FRAMES) {
+          const sortedFields = sortByNameAscending(mergedFields);
+          console.log(sortedFields, "sorted fields")
+        }
         // - Merge fields from frames.
         // - Process Fields and send event once all fields are collected.
       });
