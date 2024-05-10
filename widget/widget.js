@@ -18,9 +18,9 @@ function sendFieldsToTopWindow(fields) {
 
 const sortByNameAscending = (array) => {
   return array.slice().sort((a, b) => {
-    const nameA = Object.keys(a)[0];
-    const nameB = Object.keys(b)[0];
-    return nameA.localeCompare(nameB);
+    const keyA = Object.keys(a)[0];
+    const keyB = Object.keys(b)[0];
+    return keyA.localeCompare(keyB) || a[keyA].localeCompare(b[keyB]);
   });
 };
 
