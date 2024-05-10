@@ -21,11 +21,14 @@ const sortByNameAscending = (array) => {
 };
 
 function countFrames(windowObj) {
+  if (!windowObj) {
+    return 0;
+  }
   let count = 0;
 
-  for (let i = 0; i < windowObj.frames.length; i++) {
+  for (let i = 0; i < windowObj?.frames?.length; i++) {
     count++;
-    count += countFrames(windowObj.frames[i]);
+    count += countFrames(windowObj?.frames[i]);
   }
 
   return count;
