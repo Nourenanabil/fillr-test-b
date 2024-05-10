@@ -66,3 +66,52 @@ describe("Widget #scrapeFields", () =>{
     ]);
   });
 })
+
+describe('Widget #sortByNameAscending', () => {
+  it('should return an empty array if input array is empty', () => {
+    const result = sortByNameAscending([]);
+    expect(result).to.be.an('array').that.is.empty;
+  });
+
+  it('should return the same array if it has only one element', () => {
+    const input = [{ 'first_name': 'First Name' }];
+    const result = sortByNameAscending(input);
+    expect(result).to.deep.equal(input);
+  });
+
+  it('should sort an array of objects by name in ascending order', () => {
+    const input = [
+      { 'last_name': 'Last Name' },
+      { 'first_name': 'First Name' },
+      { 'country': 'Country' },
+      { 'address_line_1': 'Address Line 1' }
+    ];
+    const expected = [
+      { 'address_line_1': 'Address Line 1' },
+      { 'country': 'Country' },
+      { 'first_name': 'First Name' },
+      { 'last_name': 'Last Name' }
+    ];
+    const result = sortByNameAscending(input);
+    expect(result).to.deep.equal(expected);
+  });
+
+  it('should handle arrays with objects having duplicate names', () => {
+    const input = [
+      { 'last_name': 'Last Name' },
+      { 'first_name': 'First Name' },
+      { 'country': 'Country' },
+      { 'address_line_1': 'Address Line 1' },
+      { 'last_name': 'Another Last Name' }
+    ];
+    const expected = [
+      { 'address_line_1': 'Address Line 1' },
+      { 'country': 'Country' },
+      { 'first_name': 'First Name' },
+      { 'last_name': 'Another Last Name' },
+      { 'last_name': 'Last Name' }
+    ];
+    const result = sortByNameAscending(input);
+    expect(result).to.deep.equal(expected);
+  });
+});
