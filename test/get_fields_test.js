@@ -115,3 +115,23 @@ describe('Widget #sortByNameAscending', () => {
     expect(result).to.deep.equal(expected);
   });
 });
+
+describe('Widget #countFrames', () => {
+  it('should return 0 for a window with no frames', () => {
+    const windowObj = { frames: [] };
+    const result = countFrames(windowObj);
+    expect(result).to.equal(0);
+  });
+
+  it('should return the correct count for a window with frames', () => {
+    const windowObj = {
+      frames: [
+        { frames: [] }, // One frame with no sub-frames
+        { frames: [{}, {}] }, // One frame with two sub-frames
+        {} // One frame with no sub-frames
+      ]
+    };
+    const result = countFrames(windowObj);
+    expect(result).to.equal(5); // Total frames: 1 + 2 + 2 = 5
+  });
+});
