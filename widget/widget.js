@@ -12,10 +12,6 @@ function isTopFrame() {
   return window.location.pathname === TOP_FRAME_LOCATION;
 }
 
-function sendFieldsToTopWindow(fields) {
-  getTopFrame().postMessage(fields, TOP_WINDOW_URL);
-}
-
 const sortByNameAscending = (array) => {
   return array.slice().sort((a, b) => {
     const keyA = Object.keys(a)[0];
@@ -57,7 +53,7 @@ function execute(totalFrames) {
     const fields = scrapeFields();
 
     if (!isTopFrame()) {
-      sendFieldsToTopWindow(fields);
+      getTopFrame().postMessage(fields, TOP_WINDOW_URL);
       return;
     }
 
